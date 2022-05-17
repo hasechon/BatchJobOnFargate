@@ -163,11 +163,12 @@ Resources:
         Version: 2012-10-17
         Statement:
           - Effect: Allow
-        Principal:
-          Service: ecs-tasks.amazonaws.com
-        Action: sts:AssumeRole
-        ManagedPolicyArns:
-          - !Ref ECSTaskRoleIAMPolicy
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Ref ECSTaskRoleIAMPolicy
 
   # ------------------------------------------------------------#
   # ECS Task Execution Role
@@ -181,11 +182,12 @@ Resources:
         Version: 2012-10-17
         Statement:
           - Effect: Allow
-            Principal:
-              Service: ecs-tasks.amazonaws.com
             Action: sts:AssumeRole
-            ManagedPolicyArns:
-              - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
 
   # ------------------------------------------------------------#
   # ECS TaskDefinition
@@ -212,9 +214,9 @@ Resources:
               awslogs-group: !Ref ECSLogGroup
               awslogs-region: !Ref "AWS::Region"
               awslogs-stream-prefix: !Ref ProjectName
-              MemoryReservation: 128
-              PortMappings:
-                - HostPort: 80
+          MemoryReservation: 128
+          PortMappings:
+            - HostPort: 80
               Protocol: tcp
               ContainerPort: 80
 
