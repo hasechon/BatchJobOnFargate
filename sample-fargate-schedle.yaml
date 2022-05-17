@@ -1,252 +1,246 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description:
-    Fargate and ALB Create
+Description: Fargate and ALB Create
 
 Metadata:
-    "AWS::CloudFormation::Interface":
-        ParameterGroups:
-            - 
-                Label:
-                    default: "Project Name Prefix"
-                Parameters:
-                    - ProjectName
-            - 
-                Label:
-                    default: "Fargate for ECS Configuration"
-                Parameters:
-                    - ECSClusterName
-                    - ECSTaskName
-                    - ECSTaskCPUUnit
-                    - ECSTaskMemory
-                    - ECSContainerName
-                    - ECSImageName
-                    - ECSServiceName
-                    - ECSTaskDesiredCount
-                    - ECSScheduleRuleName
-                    - ECSScheduleTargetName
+  "AWS::CloudFormation::Interface":
+    ParameterGroups:
+      - Label:
+          default: "Project Name Prefix"
+        Parameters:
+          - ProjectName
+      - Label:
+          default: "Fargate for ECS Configuration"
+        Parameters:
+          - ECSClusterName
+          - ECSTaskName
+          - ECSTaskCPUUnit
+          - ECSTaskMemory
+          - ECSContainerName
+          - ECSImageName
+          - ECSServiceName
+          - ECSTaskDesiredCount
+          - ECSScheduleRuleName
+          - ECSScheduleTargetName
 
-        ParameterLabels:
-            ECSClusterName:
-                default: "ECSClusterName"
-            ECSTaskName:
-                default: "ECSTaskName"
-            ECSTaskCPUUnit:
-                default: "ECSTaskCPUUnit"
-            ECSTaskMemory:
-                default: "ECSTaskMemory"
-            ECSContainerName:
-                default: "ECSContainerName"
-            ECSImageName:
-                default: "ECSImageName"
-            ECSServiceName:
-                default: "ECSServiceName"
-            ECSTaskDesiredCount:
-                default: "ECSTaskDesiredCount"
+    ParameterLabels:
+      ECSClusterName:
+        default: "ECSClusterName"
+      ECSTaskName:
+        default: "ECSTaskName"
+      ECSTaskCPUUnit:
+        default: "ECSTaskCPUUnit"
+      ECSTaskMemory:
+        default: "ECSTaskMemory"
+      ECSContainerName:
+        default: "ECSContainerName"
+      ECSImageName:
+        default: "ECSImageName"
+      ECSServiceName:
+        default: "ECSServiceName"
+      ECSTaskDesiredCount:
+        default: "ECSTaskDesiredCount"
 
 # ------------------------------------------------------------#
 # Input Parameters
 # ------------------------------------------------------------#
 Parameters:
-    ProjectName:
-        Default: sample-fargate-batch
-        Type: String
+  ProjectName:
+    Default: sample-fargate-batch
+    Type: String
 
-    #VPCID
-    VpcId:
-        Description : "VPC ID"
-        Type: AWS::EC2::VPC::Id
+  #VPCID
+  VpcId:
+    Description: "VPC ID"
+    Type: AWS::EC2::VPC::Id
 
-    #ECSSecurity Group
-    ECSSecurityGroupId:
-        Type: AWS::EC2::SecurityGroup::Id
+  #ECSSecurity Group
+  ECSSecurityGroupId:
+    Type: AWS::EC2::SecurityGroup::Id
 
-    #ECSSubnet1
-    ECSSubnetId1:
-        Description : "ECS Subnet 1st"
-        Type : AWS::EC2::Subnet::Id
+  #ECSSubnet1
+  ECSSubnetId1:
+    Description: "ECS Subnet 1st"
+    Type: AWS::EC2::Subnet::Id
 
-    #ECSSubnet2
-    ECSSubnetId2:
-        Description : "ECS Subnet 2st"
-        Type : AWS::EC2::Subnet::Id
+  #ECSSubnet2
+  ECSSubnetId2:
+    Description: "ECS Subnet 2st"
+    Type: AWS::EC2::Subnet::Id
 
-    #ECSClusterName
-    ECSClusterName:
-        Type: String
-        Default: "cluster"
+  #ECSClusterName
+  ECSClusterName:
+    Type: String
+    Default: "cluster"
 
-    #ECSTaskName
-    ECSTaskName:
-        Type: String
-        Default: "task"
+  #ECSTaskName
+  ECSTaskName:
+    Type: String
+    Default: "task"
 
-    #ECSTaskCPUUnit
-    ECSTaskCPUUnit:
-        AllowedValues: [ 256, 512, 1024, 2048, 4096 ]
-        Type: String
-        Default: "256"
+  #ECSTaskCPUUnit
+  ECSTaskCPUUnit:
+    AllowedValues: [256, 512, 1024, 2048, 4096]
+    Type: String
+    Default: 256
 
-    #ECSTaskMemory
-    ECSTaskMemory:
-        AllowedValues: [ 256, 512, 1024, 2048, 4096 ]
-        Type: String
-        Default: "512"
+  #ECSTaskMemory
+  ECSTaskMemory:
+    AllowedValues: [256, 512, 1024, 2048, 4096]
+    Type: String
+    Default: 512
 
-    #ECSContainerName
-    ECSContainerName:
-        Type: String
-        Default: "container"
+  #ECSContainerName
+  ECSContainerName:
+    Type: String
+    Default: "container"
 
-    #ECSImageName
-    ECSImageName:
-        Type: String
-        Default: "xxxxxxxxxxxx.dkr.ecr.ap-northeast-1.amazonaws.com/kaji-test-ecr:latest"
+  #ECSImageName
+  ECSImageName:
+    Type: String
+    Default: "xxxxxxxxxxxx.dkr.ecr.ap-northeast-1.amazonaws.com/kaji-test-ecr:latest"
 
-    #ECSServiceName
-    ECSServiceName:
-        Type: String
-        Default: "service"
+  #ECSServiceName
+  ECSServiceName:
+    Type: String
+    Default: "service"
 
-    #ECSTaskDesiredCount
-    ECSTaskDesiredCount:
-        Type: Number
-        Default: 1
+  #ECSTaskDesiredCount
+  ECSTaskDesiredCount:
+    Type: Number
+    Default: 1
 
-    #ECSScheduleRuleName
-    ECSScheduleRuleName:
-        Type: String
-        Default: "batch-1day"
+  #ECSScheduleRuleName
+  ECSScheduleRuleName:
+    Type: String
+    Default: "batch-1day"
 
-    #ECSScheduleTargetName
-    ECSScheduleTargetName:
-        Type: String
-        Default: "target"
+  #ECSScheduleTargetName
+  ECSScheduleTargetName:
+    Type: String
+    Default: "target"
 
 Resources:
+  # ------------------------------------------------------------#
+  # ECS Cluster
+  # ------------------------------------------------------------#
+  ECSCluster:
+    Type: "AWS::ECS::Cluster"
+    Properties:
+      ClusterName: !Sub "${ProjectName}-${ECSClusterName}"
 
-# ------------------------------------------------------------#
-# ECS Cluster
-# ------------------------------------------------------------#
-    ECSCluster:
-        Type: "AWS::ECS::Cluster"
-        Properties:
-            ClusterName: !Sub "${ProjectName}-${ECSClusterName}"
+  # ------------------------------------------------------------#
+  # ECS LogGroup
+  # ------------------------------------------------------------#
+  ECSLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Sub "/ecs/logs/${ProjectName}-ecs-group"
 
-# ------------------------------------------------------------#
-# ECS LogGroup
-# ------------------------------------------------------------#
-    ECSLogGroup:
-        Type: "AWS::Logs::LogGroup"
-        Properties:
-            LogGroupName: !Sub "/ecs/logs/${ProjectName}-ecs-group"
-
-# ------------------------------------------------------------#
-# ECS Task Role IAM Policy
-# ------------------------------------------------------------#
-    ECSTaskRoleIAMPolicy:
-        Type: AWS::IAM::ManagedPolicy
-        Properties:
-            ManagedPolicyName: !Sub "${ProjectName}-ECSTaskPolicy"
-            PolicyDocument:
-                Version: 2012-10-17
-                Statement:
-                    - Effect: Allow
-                Action:
-                    - sqs:SendMessage
-                Resource: "*"
-
-# ------------------------------------------------------------#
-# ECS Task Role
-# ------------------------------------------------------------#
-    ECSTaskRole:
-        Type: AWS::IAM::Role
-        Properties:
-            RoleName: !Sub "${ProjectName}-ECSTaskRolePolicy"
-            Path: /
-            AssumeRolePolicyDocument:
-                Version: 2012-10-17
-                Statement:
-                    - Effect: Allow
-                Principal:
-                    Service: ecs-tasks.amazonaws.com
-                Action: sts:AssumeRole
-                ManagedPolicyArns:
-                - !Ref ECSTaskRoleIAMPolicy
-
-# ------------------------------------------------------------#
-# ECS Task Execution Role
-# ------------------------------------------------------------#
-    ECSTaskExecutionRole:
-        Type: AWS::IAM::Role
-        Properties:
-            oleName: !Sub "${ProjectName}-ECSTaskExecutionRolePolicy"
-        Path: /
-        AssumeRolePolicyDocument:
-            Version: 2012-10-17
+  # ------------------------------------------------------------#
+  # ECS Task Role IAM Policy
+  # ------------------------------------------------------------#
+  ECSTaskRoleIAMPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${ProjectName}-ECSTaskPolicy"
+      PolicyDocument:
+        Version: 2012-10-17
         Statement:
-            - Effect: Allow
+          - Effect: Allow
+            Action:
+              - sqs:SendMessage
+            Resource: "*"
+
+  # ------------------------------------------------------------#
+  # ECS Task Role
+  # ------------------------------------------------------------#
+  ECSTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${ProjectName}-ECSTaskRolePolicy"
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
         Principal:
-        Service: ecs-tasks.amazonaws.com
+          Service: ecs-tasks.amazonaws.com
         Action: sts:AssumeRole
         ManagedPolicyArns:
-            - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+          - !Ref ECSTaskRoleIAMPolicy
 
-# ------------------------------------------------------------#
-# ECS TaskDefinition
-# ------------------------------------------------------------#
-    ECSTaskDefinition:
-        Type: "AWS::ECS::TaskDefinition"
-        Properties:
-            Cpu: !Ref ECSTaskCPUUnit
-            ExecutionRoleArn: !Ref ECSTaskExecutionRole
-            Family: !Sub "${ProjectName}-${ECSTaskName}"
-            Memory: !Ref ECSTaskMemory
-            NetworkMode: awsvpc
-            TaskRoleArn: !Ref ECSTaskRole
-            RequiresCompatibilities:
-                - FARGATE
+  # ------------------------------------------------------------#
+  # ECS Task Execution Role
+  # ------------------------------------------------------------#
+  ECSTaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${ProjectName}-ECSTaskExecutionRolePolicy"
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+            Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+            ManagedPolicyArns:
+              - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
 
-            #ContainerDefinitions
-            ContainerDefinitions:
-                - 
-                    Name: !Sub "${ProjectName}-${ECSContainerName}"
-                    Image: !Ref ECSImageName
-                    LogConfiguration:
-                        LogDriver: awslogs
-                    Options:
-                        awslogs-group: !Ref ECSLogGroup
-                    awslogs-region: !Ref "AWS::Region"
-                    awslogs-stream-prefix: !Ref ProjectName
-                    MemoryReservation: 128
-                    PortMappings:
-                    - HostPort: 80
-                    Protocol: tcp
-                    ContainerPort: 80
+  # ------------------------------------------------------------#
+  # ECS TaskDefinition
+  # ------------------------------------------------------------#
+  ECSTaskDefinition:
+    Type: "AWS::ECS::TaskDefinition"
+    Properties:
+      Cpu: !Ref ECSTaskCPUUnit
+      ExecutionRoleArn: !GetAtt ECSTaskExecutionRole.Arn
+      Family: !Sub "${ProjectName}-${ECSTaskName}"
+      Memory: !Ref ECSTaskMemory
+      NetworkMode: awsvpc
+      TaskRoleArn: !Ref ECSTaskRole
+      RequiresCompatibilities:
+        - FARGATE
 
-# ------------------------------------------------------------#
-# ECS Events Rule
-# ------------------------------------------------------------#
-    ECSSchedule:
-        Type: AWS::Events::Rule
-        Description: ''
-        Properties:
-            State: ENABLED
-            ScheduleExpression: rate(1 day)
-            Name: !Ref ECSScheduleRuleName
-            Targets:
-                - 
-                    Id: !Sub "${ECSScheduleRuleName}-${ECSScheduleTargetName}"
-                    Arn: !GetAtt ECSCluster.Arn
-                    RoleArn: !GetAtt ECSTaskExecutionRole.Arn
-            EcsParameters:
-                TaskDefinitionArn: !Ref ECSTaskDefinition
-                TaskCount: !Ref ECSTaskDesiredCount
-                LaunchType: FARGATE
-                NetworkConfiguration:
-                    AwsVpcConfiguration:
-                        AssignPublicIp: DISABLED
-                        SecurityGroups:
-                            - !Ref ECSSecurityGroupId
-                        Subnets:
-                            - !Ref ECSSubnetId1
-                            - !Ref ECSSubnetId2
+      #ContainerDefinitions
+      ContainerDefinitions:
+        - Name: !Sub "${ProjectName}-${ECSContainerName}"
+          Image: !Ref ECSImageName
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref ECSLogGroup
+              awslogs-region: !Ref "AWS::Region"
+              awslogs-stream-prefix: !Ref ProjectName
+              MemoryReservation: 128
+              PortMappings:
+                - HostPort: 80
+              Protocol: tcp
+              ContainerPort: 80
+
+  # ------------------------------------------------------------#
+  # ECS Events Rule
+  # ------------------------------------------------------------#
+  ECSSchedule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: ""
+      State: ENABLED
+      ScheduleExpression: rate(1 day)
+      Name: !Ref ECSScheduleRuleName
+      Targets:
+        - Id: !Sub "${ECSScheduleRuleName}-${ECSScheduleTargetName}"
+          Arn: !GetAtt ECSCluster.Arn
+          RoleArn: !GetAtt ECSTaskExecutionRole.Arn
+          EcsParameters:
+            TaskDefinitionArn: !Ref ECSTaskDefinition
+            TaskCount: !Ref ECSTaskDesiredCount
+            LaunchType: FARGATE
+            NetworkConfiguration:
+              AwsVpcConfiguration:
+                AssignPublicIp: DISABLED
+                SecurityGroups:
+                  - !Ref ECSSecurityGroupId
+                Subnets:
+                  - !Ref ECSSubnetId1
+                  - !Ref ECSSubnetId2
