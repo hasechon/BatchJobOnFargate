@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: VPC for Fargate
+
+Resources:
+  myVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      Tags:
+        - Key: Name
+          Value: FargateVPC
+
+  # https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-vpc.html#cfn-ec2-vpc-tags
+
+  mySubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref myVPC
+      CidrBlock: 10.0.10.0/24
+      Tags:
+        - Key: Name
+          Value: PrivateSubnetForFargate
+
+
+https://saramune.github.io/objekumo/2019/05/07/20190507/
+https://docs.aws.amazon.com/ja_jp/vpc/latest/privatelink/vpce-interface.html
+
+
+# サービスごとに作成する
+  myVPCEndpointForSQS:
+    Type: AWS::EC2::VPCEndpoint
+    Properties: 
+      ServiceName: myEndpoint
+      VpcId: !Ref myVPC
+      SubnetIds: 
+        - !Ref mySubnet
+      VpcEndpointType: Interface
