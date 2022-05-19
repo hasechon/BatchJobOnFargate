@@ -80,3 +80,18 @@ Resources:
           - .dynamodb
       VpcId: !Ref myVPC
       VpcEndpointType: Gateway
+
+  # logs
+  myVPCEndpointForLogs:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: !Join
+        - ""
+        - - com.amazonaws.
+          - !Ref "AWS::Region"
+          - .logs
+      VpcId: !Ref myVPC
+      SubnetIds:
+        - !Ref mySubnet
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: True
