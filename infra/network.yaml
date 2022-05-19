@@ -6,6 +6,7 @@ Resources:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock: 10.0.0.0/16
+      EnableDnsHostnames: True
       Tags:
         - Key: Name
           Value: FargateVPC
@@ -21,17 +22,61 @@ Resources:
         - Key: Name
           Value: PrivateSubnetForFargate
 
+  # https://saramune.github.io/objekumo/2019/05/07/20190507/
+  # https://docs.aws.amazon.com/ja_jp/vpc/latest/privatelink/vpce-interface.html
+  # https://dev.classmethod.jp/articles/privatesubnet_ecs/
 
-https://saramune.github.io/objekumo/2019/05/07/20190507/
-https://docs.aws.amazon.com/ja_jp/vpc/latest/privatelink/vpce-interface.html
-
-
-# サービスごとに作成する
+  # サービスごとに作成する
+  # SQS
   myVPCEndpointForSQS:
     Type: AWS::EC2::VPCEndpoint
-    Properties: 
-      ServiceName: myEndpoint
+    Properties:
+      ServiceName: !Join
+        - ""
+        - - com.amazonaws.
+          - !Ref "AWS::Region"
+          - .sqs
       VpcId: !Ref myVPC
-      SubnetIds: 
+      SubnetIds:
         - !Ref mySubnet
       VpcEndpointType: Interface
+      PrivateDnsEnabled: True
+
+  # ECR
+  myVPCEndpointForECR:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: !Join
+        - ""
+        - - com.amazonaws.
+          - !Ref "AWS::Region"
+          - .ecr.dkr
+      VpcId: !Ref myVPC
+      SubnetIds:
+        - !Ref mySubnet
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: True
+
+  # S3
+  myVPCEndpointForS3:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: !Join
+        - ""
+        - - com.amazonaws.
+          - !Ref "AWS::Region"
+          - .s3
+      VpcId: !Ref myVPC
+      VpcEndpointType: Gateway
+
+  # DynamoDB
+  myVPCEndpointForDynamo:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: !Join
+        - ""
+        - - com.amazonaws.
+          - !Ref "AWS::Region"
+          - .dynamodb
+      VpcId: !Ref myVPC
+      VpcEndpointType: Gateway
