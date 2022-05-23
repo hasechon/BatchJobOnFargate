@@ -62,11 +62,6 @@ Parameters:
     Description: "ECS Subnet 1st"
     Type: AWS::EC2::Subnet::Id
 
-  #ECSSubnet2
-  ECSSubnetId2:
-    Description: "ECS Subnet 2st"
-    Type: AWS::EC2::Subnet::Id
-
   #ECSClusterName
   ECSClusterName:
     Type: String
@@ -97,7 +92,6 @@ Parameters:
   #ECSImageName
   ECSImageName:
     Type: String
-    Default: "xxxxxxxxxxxx.dkr.ecr.ap-northeast-1.amazonaws.com/kaji-test-ecr:latest"
 
   #ECSServiceName
   ECSServiceName:
@@ -245,4 +239,3 @@ Resources:
                   - !Ref ECSSecurityGroupId
                 Subnets:
                   - !Ref ECSSubnetId1
-                  - !Ref ECSSubnetId2
