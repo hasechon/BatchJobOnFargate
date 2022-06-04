@@ -67,6 +67,21 @@ Resources:
       VpcEndpointType: Interface
       PrivateDnsEnabled: True
 
+  # ECR
+  myVPCEndpointForECRAPI:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: !Join
+        - ""
+        - - com.amazonaws.
+          - !Ref "AWS::Region"
+          - .ecr.api
+      VpcId: !Ref myVPC
+      SubnetIds:
+        - !Ref mySubnet
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: True
+
   # S3
   myVPCEndpointForS3:
     Type: AWS::EC2::VPCEndpoint
