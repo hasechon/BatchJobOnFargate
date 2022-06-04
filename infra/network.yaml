@@ -7,13 +7,14 @@ Resources:
     Properties:
       CidrBlock: 10.0.0.0/16
       EnableDnsHostnames: True
+      EnableDnsSupport: True
       Tags:
         - Key: Name
           Value: FargateVPC
 
   # https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-vpc.html#cfn-ec2-vpc-tags
 
-  mySubnet:
+  ExecuteSubnet:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref myVPC
@@ -21,6 +22,15 @@ Resources:
       Tags:
         - Key: Name
           Value: PrivateSubnetForFargate
+
+  DebugSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref myVPC
+      CidrBlock: 10.0.20.0/24
+      Tags:
+        - Key: Name
+          Value: PublicSubnetForFargate
 
   # https://saramune.github.io/objekumo/2019/05/07/20190507/
   # https://docs.aws.amazon.com/ja_jp/vpc/latest/privatelink/vpce-interface.html
@@ -38,7 +48,7 @@ Resources:
           - .sqs
       VpcId: !Ref myVPC
       SubnetIds:
-        - !Ref mySubnet
+        - !Ref ExecuteSubnet
       VpcEndpointType: Interface
       PrivateDnsEnabled: True
 
@@ -53,7 +63,7 @@ Resources:
           - .ecr.dkr
       VpcId: !Ref myVPC
       SubnetIds:
-        - !Ref mySubnet
+        - !Ref ExecuteSubnet
       VpcEndpointType: Interface
       PrivateDnsEnabled: True
 
@@ -68,6 +78,8 @@ Resources:
           - .s3
       VpcId: !Ref myVPC
       VpcEndpointType: Gateway
+      RouteTableIds:
+        - !Ref RouteTable
 
   # DynamoDB
   myVPCEndpointForDynamo:
@@ -80,6 +92,8 @@ Resources:
           - .dynamodb
       VpcId: !Ref myVPC
       VpcEndpointType: Gateway
+      RouteTableIds:
+        - !Ref RouteTable
 
   # logs
   myVPCEndpointForLogs:
@@ -92,6 +106,38 @@ Resources:
           - .logs
       VpcId: !Ref myVPC
       SubnetIds:
-        - !Ref mySubnet
+        - !Ref ExecuteSubnet
       VpcEndpointType: Interface
       PrivateDnsEnabled: True
+
+  InterfaceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security Group for interfaces
+      SecurityGroupIngress:
+        - IpProtocol: "-1"
+          CidrIp: 10.0.10.0/24
+      SecurityGroupEgress:
+        - IpProtocol: "-1"
+          CidrIp: 10.0.10.0/24
+          FromPort: "443"
+          ToPort: "443"
+      Tags:
+        - Key: Name
+          Value: pgname-interface-sg
+      VpcId: !Ref myVPC
+
+  # 実行サブネットに紐づけるルートテーブル
+  # s3とDynamoDBのエンドポイントに向けてのルートを設定する
+  RouteTable:
+    Type: "AWS::EC2::RouteTable"
+    Properties:
+      VpcId: !Ref myVPC
+      Tags:
+        - Key: Name
+          Value: pgname-RouteTable
+  SubnetRouteTableAssociation:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref ExecuteSubnet
