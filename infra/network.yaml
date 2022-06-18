@@ -51,6 +51,8 @@ Resources:
         - !Ref ExecuteSubnet
       VpcEndpointType: Interface
       PrivateDnsEnabled: True
+      SecurityGroupIds:
+        - !Ref InterfaceSecurityGroup
 
   # ECR
   myVPCEndpointForECR:
@@ -66,6 +68,8 @@ Resources:
         - !Ref ExecuteSubnet
       VpcEndpointType: Interface
       PrivateDnsEnabled: True
+      SecurityGroupIds:
+        - !Ref InterfaceSecurityGroup
 
   # ECR
   myVPCEndpointForECRAPI:
@@ -78,9 +82,11 @@ Resources:
           - .ecr.api
       VpcId: !Ref myVPC
       SubnetIds:
-        - !Ref mySubnet
+        - !Ref ExecuteSubnet
       VpcEndpointType: Interface
       PrivateDnsEnabled: True
+      SecurityGroupIds:
+        - !Ref InterfaceSecurityGroup
 
   # S3
   myVPCEndpointForS3:
@@ -124,6 +130,8 @@ Resources:
         - !Ref ExecuteSubnet
       VpcEndpointType: Interface
       PrivateDnsEnabled: True
+      SecurityGroupIds:
+        - !Ref InterfaceSecurityGroup
 
   InterfaceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
